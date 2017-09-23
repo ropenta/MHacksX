@@ -34,7 +34,7 @@ http.createServer(app).listen(1337, () => {
 	bodyText = 'Unregistered face detected, unlock door for unauthorized user?';
   }
   client.messages.create({
-	to: '+14165797485',  // Text this number
+	to: '+15174025378',  // Text this number
 	from: '+12264551302',
 	body: bodyText,
 	mediaUrl: 'https://c1.staticflickr.com/3/2899/14341091933_1e92e62d12_b.jpg', //change this to public image url
