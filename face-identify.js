@@ -1,6 +1,6 @@
     
     var link = "http://dev.bionavist.com/bucket/photo.jpg";
-    var christinaID = "d4c1d994-ebb1-4e28-9e25-b25c57e30447";
+    var christinaID = "54006410-003f-4e90-a551-6c53b7c7c4b8";
     var christinaArray = ["https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/1.jpg?alt=media&token=d0708ed4-295d-47bd-809a-81d4c4b6a4e0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/2.jpg?alt=media&token=46857fef-5331-40b9-b15e-11fcbe19abb0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/4.jpg?alt=media&token=96a5ef34-2447-41dd-94f3-b5689c5c2936","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/5.jpg?alt=media&token=b49aa3a4-8902-47d1-a0d7-942115176b27"];
     
     
@@ -59,8 +59,8 @@
         };
 
         // Display the image.
-        var sourceImageUrl = document.getElementById("inputFace").value;
-        document.querySelector("#sourceImage").src = sourceImageUrl;
+        //var sourceImageUrl = document.getElementById("inputFace").value;
+        //document.querySelector("#sourceImage").src = sourceImageUrl;
         /*var faceDetectData = detectFacesInputted(sourceImageUrl);
         var multipleFaces = (typeof faceDetectData.faceId==='object');
         console.log(faceDetectData.faceId);
@@ -82,7 +82,7 @@
             type: "POST",
 
             // Request body.
-            data: '{"url": "' + sourceImageUrl + '"}',
+            data: '{"url": "' + link + '"}',
         })
 
         .done(function(data) {
@@ -111,7 +111,18 @@
                     console.log(JSON.stringify(data, null, 2));
                     // Show formatted JSON on webpage.
                     $("#responseTextArea").val(JSON.stringify(data, null, 2));
-                    return JSON.stringify(data, null, 2);
+                    if(data[0].candidates.length==0) {
+                        //twillio text for stranger
+                        console.log("STRANGER DANGER");
+                    }
+                    else {
+                        //twillio text for friend 
+                        var friendName = getPerson(data[0].candidates[0]);
+                        console.log("friendName: " + friendName);
+                        //twillio text owner
+                        
+                    }
+                    return data;
                 })
 
                 .fail(function(jqXHR, textStatus, errorThrown) {
@@ -162,7 +173,38 @@
             alert(errorString);
         });
     }
-    
+
+    function getPerson(personId) {
+        var subscriptionKey = "0c6796899d274f52a65d2a95f8c08acd";
+        var uriBase = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/friends/persons/";
+        var params = {
+            
+        };
+        $.ajax({
+            url: uriBase + personId + "?" + $.param(params),
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key",subscriptionKey);
+            },
+            type: "GET",
+            //REQUEST BODY
+        })
+        .done(function(data) {
+            // Show formatted JSON on webpage.
+            $("#responseTextArea").val(JSON.stringify(data, null, 2));
+            return data;
+            
+        })
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ? "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ? "" : (jQuery.parseJSON(jqXHR.responseText).message) ? 
+                jQuery.parseJSON(jqXHR.responseText).message : jQuery.parseJSON(jqXHR.responseText).error.message;
+            alert(errorString);
+        });
+    }
+
     function getPeople() {
         var subscriptionKey = "a4215e25032e4862aa0185fb92aa2a8a";
         var uriBase = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/friends/persons?";
