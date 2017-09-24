@@ -1,10 +1,9 @@
     
-    var link = "http://dev.bionavist.com/bucket/photo.jpg";
+    var link = "http://dev.bionavist.com/bucket/photo1.jpg";
     var christinaID = "a179d515-af1f-460f-b5a0-c99533e783d0";
     //*var christinaArray = ["https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/1.jpg?alt=media&token=d0708ed4-295d-47bd-809a-81d4c4b6a4e0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/2.jpg?alt=media&token=46857fef-5331-40b9-b15e-11fcbe19abb0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/4.jpg?alt=media&token=96a5ef34-2447-41dd-94f3-b5689c5c2936","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/5.jpg?alt=media&token=b49aa3a4-8902-47d1-a0d7-942115176b27","http://dev.bionavist.com/bucket/photo.jpg"]; */
     var christinaArray = ["http://dev.bionavist.com/bucket/photo1.jpg","http://dev.bionavist.com/bucket/photo2.jpg","http://dev.bionavist.com/bucket/photo3.jpg","http://dev.bionavist.com/bucket/photo5.jpg","http://dev.bionavist.com/bucket/photo6.jpg"];
 //,"http://dev.bionavist.com/bucket/photo4.jpg"
-    
     
     function populateFaces() {
         
@@ -56,6 +55,7 @@
         var subscriptionKey = "0c6796899d274f52a65d2a95f8c08acd";
         var uriBase = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/detect";
         var uriBase2 = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/identify";
+        var uriBase3 = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/friends/persons/";
 
         // Request parameters.
         var params = {
@@ -120,6 +120,7 @@
                     console.log(JSON.stringify(data, null, 2));
                     // Show formatted JSON on webpage.
                     var name = "";
+                    
                     $("#responseTextArea").val(JSON.stringify(data, null, 2));
                     
                     if(data[0].candidates.length==0) {
@@ -130,9 +131,37 @@
                     }
                     else {
                         //twillio text for friend 
-                        var friendName = getPerson(data[0].candidates[0]);
-                        name = friendName;
-                        console.log("friendName: " + friendName);
+                        var friendId = data[0].candidates[0].personId;
+                        //getPerson(friendId);
+                        
+                        $.ajax({
+                            url: uriBase3 + friendId,
+                            beforeSend: function(xhrObj){
+                                xhrObj.setRequestHeader("Content-Type","application/json");
+                                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key",subscriptionKey);
+                            },
+                            type: "GET",
+                            //REQUEST BODY
+                            })
+                            .done(function(data) {
+                                // Show formatted JSON on webpage.
+                                //$("#responseTextArea").val(JSON.stringify(data, null, 2));
+                                console.log(data);
+                                name = data.name;
+                                console.log(name);
+                                //console.log(friendName);
+
+                                return data;
+
+                            })
+
+                            .fail(function(jqXHR, textStatus, errorThrown) {
+                                // Display error message.
+                                var errorString = (errorThrown === "") ? "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+                                errorString += (jqXHR.responseText === "") ? "" : (jQuery.parseJSON(jqXHR.responseText).message) ? 
+                                    jQuery.parseJSON(jqXHR.responseText).message : jQuery.parseJSON(jqXHR.responseText).error.message;
+                                alert(errorString);
+                            });
                         //twillio text owner
                         
                     }
@@ -206,7 +235,11 @@
         })
         .done(function(data) {
             // Show formatted JSON on webpage.
-            $("#responseTextArea").val(JSON.stringify(data, null, 2));
+            //$("#responseTextArea").val(JSON.stringify(data, null, 2));
+            console.log(data);
+            friend = data;
+            //console.log(friendName);
+            
             return data;
             
         })
