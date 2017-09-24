@@ -1,11 +1,15 @@
     
     var link = "http://dev.bionavist.com/bucket/photo.jpg";
-    var christinaID = "54006410-003f-4e90-a551-6c53b7c7c4b8";
-    var christinaArray = ["https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/1.jpg?alt=media&token=d0708ed4-295d-47bd-809a-81d4c4b6a4e0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/2.jpg?alt=media&token=46857fef-5331-40b9-b15e-11fcbe19abb0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/4.jpg?alt=media&token=96a5ef34-2447-41dd-94f3-b5689c5c2936","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/5.jpg?alt=media&token=b49aa3a4-8902-47d1-a0d7-942115176b27"];
+    var christinaID = "a179d515-af1f-460f-b5a0-c99533e783d0";
+    //*var christinaArray = ["https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/1.jpg?alt=media&token=d0708ed4-295d-47bd-809a-81d4c4b6a4e0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/2.jpg?alt=media&token=46857fef-5331-40b9-b15e-11fcbe19abb0","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/4.jpg?alt=media&token=96a5ef34-2447-41dd-94f3-b5689c5c2936","https://firebasestorage.googleapis.com/v0/b/testproj-e7154.appspot.com/o/5.jpg?alt=media&token=b49aa3a4-8902-47d1-a0d7-942115176b27","http://dev.bionavist.com/bucket/photo.jpg"]; */
+    var christinaArray = ["http://dev.bionavist.com/bucket/photo1.jpg","http://dev.bionavist.com/bucket/photo2.jpg","http://dev.bionavist.com/bucket/photo3.jpg","http://dev.bionavist.com/bucket/photo5.jpg","http://dev.bionavist.com/bucket/photo6.jpg"];
+//,"http://dev.bionavist.com/bucket/photo4.jpg"
     
     
     function populateFaces() {
+        
         var faceIdList = [];
+        var inputId = document.getElementById("inputId").value;
         for(i = 0; i < christinaArray.length; i++) {
             //var data = detectFacesInputted(christinaArray[i]);
             //console.log(data);
@@ -31,7 +35,7 @@
             },
 
             type: "POST",
-            data: '{"url": ' + '"' + url + '"}',
+            data: '{"url": "' + url + '"}',
         })
 
         .done(function(data) {
@@ -66,7 +70,7 @@
         console.log(faceDetectData.faceId);
         console.log(multipleFaces);*/
         
-        
+        document.querySelector("#sourceImage").src = link;
 
         // Perform the REST API call.
         $.ajax({
@@ -82,7 +86,9 @@
             type: "POST",
 
             // Request body.
+            //data: '{"url": "' + link + '"}',
             data: '{"url": "' + link + '"}',
+            
         })
 
         .done(function(data) {
@@ -92,6 +98,9 @@
             console.log(data);
             for(var i = 0; i < faceDetectData.length; i++)
             {
+                console.log(i+"loop through faceDetectData");
+                console.log(faceDetectData);
+                console.log(faceDetectData[0].faceId);
                 $.ajax({
                     url: uriBase2,
 
@@ -110,18 +119,24 @@
                 .done(function(data) {
                     console.log(JSON.stringify(data, null, 2));
                     // Show formatted JSON on webpage.
+                    var name = "";
                     $("#responseTextArea").val(JSON.stringify(data, null, 2));
+                    
                     if(data[0].candidates.length==0) {
                         //twillio text for stranger
                         console.log("STRANGER DANGER");
+                        name = "unauthorized personnel";
+                        
                     }
                     else {
                         //twillio text for friend 
                         var friendName = getPerson(data[0].candidates[0]);
+                        name = friendName;
                         console.log("friendName: " + friendName);
                         //twillio text owner
                         
                     }
+                    
                     return data;
                 })
 
@@ -378,6 +393,12 @@
         .done(function(data) {
             // Show formatted JSON on webpage.
             $("#responseTextArea").val(JSON.stringify(data, null, 2));
+            /*var rectCoorTop = data[0].faceRectangle.top;
+            var rectCoorLeft = data[0].faceRectangle.left;
+            var rectCoorWid = data[0].faceRectangle.width;
+            var rectCoorHei = data[0].faceRectangle.height; */
+            
+            
             return JSON.stringify(data, null, 2);
         })
 
