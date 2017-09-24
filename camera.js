@@ -1,5 +1,16 @@
 var camera;
 
+function starter() {
+	init();
+	// setInterval(snap, 5000);
+	
+}
+
+function snap() {
+	var snapshot = camera.capture();
+	snapshot.get_canvas(add_snapshot);
+}
+
 function init() {
 	var options = {
 		shutter_ogg_url: "https://raw.githubusercontent.com/amw/jpeg_camera/master/dist/shutter.ogg",
@@ -9,6 +20,7 @@ function init() {
 	camera = new JpegCamera("#camera", options).ready(function (info) {
 		console.log("Camera ready", info);
 	});
+
 }
 
 function add_snapshot(element) {
@@ -27,4 +39,36 @@ function add_snapshot(element) {
 	$container.animate({
 		scrollLeft: scroll
 	}, 200);
+
+	upload_snapshot(this);
 };
+
+
+var upload_snapshot = function (snapshot) {
+	apiUrl = "http://ec2-52-25-232-222.us-west-2.compute.amazonaws.com:4567/upload";
+
+	console.log(snapshot);
+	console.log(snapshot._extra_canvas);
+
+	if (snapshot._extra_canvas.toBlob) {
+		snapshot._extra_canvas.toBlob(function (blob) {
+			var formData = new FormData();
+			formData.append('uploadfile', blob, "photo.jpg");
+			var seriesPath = apiUrl;
+			$.ajax({
+				type: "POST",
+				url: seriesPath,
+				data: formData,
+				processData: false,
+				contentType: false,
+			}).done(function () {
+				console.log("Upload Successful");
+				// more shit
+			}).fail(function () {
+			});
+		}, 'image/jpg');
+	}
+};
+
+
+window.addEventListener('load', starter, false);
