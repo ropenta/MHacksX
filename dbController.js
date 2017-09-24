@@ -5,13 +5,8 @@ const config = require('./config.json')
 firebase.initializeApp(config);
 const database = firebase.database();
 
-const filePath = `./bcn.jpg`;
-const uploadPath = `img//bcn.jpg`;
+const uploadPath = `img/bcn.jpg`;
 const testUsername = 'test cyan';
-
-function createPublicURL(storageName) {
-    return `http://storage.googleapis.com/${config.storageBucket}/${encodeURIComponent(storageName)}`;
-}
 
 function writeNewProfile(name, imageUrl) {
   firebase.database().ref('users/' + name).set({
@@ -29,8 +24,7 @@ function readProfile() {
 }
 
 function test() {
-	const imageUrl = createPublicURL(uploadPath);
-	writeNewProfile(testUsername, imageUrl);
+	writeNewProfile(testUsername, uploadPath);
 	readProfile();	
 }
 test();
